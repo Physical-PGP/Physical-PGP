@@ -1,10 +1,20 @@
 import Vue from 'vue'
-import Vuex, { StoreOptions } from 'vuex'
-
-import { State } from './stateType'
+import Vuex from 'vuex'
+import { createModule, extractVuexModule } from 'vuex-class-component'
 
 Vue.use(Vuex)
 
-const store: StoreOptions<State> = {
+const vuexModule = createModule({
+  strict: false
+})
 
+class Store extends vuexModule {
+  private testString = 'private string'
+  get test_string () {
+    return this.testString
+  }
 }
+
+export default new Vuex.Store({
+  ...extractVuexModule(Store).store
+})
