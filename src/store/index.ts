@@ -13,7 +13,7 @@ interface RSAConfig {
   option: 2048 | 4096
 }
 
-type KeyConfig = (ECCConfig | RSAConfig) & {passphrase: string}
+type KeyConfig = (ECCConfig | RSAConfig) & { passphrase: string }
 
 Vue.use(Vuex)
 
@@ -29,6 +29,10 @@ class Store extends vuexModule {
     algorithm: 'ECC',
     option: 'ed25519',
     passphrase: ''
+  }
+
+  get setupCompleted (): boolean {
+    return !!this.localPubKey && !!this.localPriKey && !!this.remotePubKey
   }
 
   @action public async gen_keypair () {
