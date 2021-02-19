@@ -1,10 +1,11 @@
 <template lang="pug">
 div
   message-card(
-    v-for="i in messageCnt"
-    :key="i"
+    v-for="(message, index) in messages" :key="index"
+    :message="message"
   )
-  button(@click="add_message_card") New
+  button(@click="new_msg_in") New In
+  button(@click="new_msg_out") New Out
   div#bottom
 </template>
 
@@ -14,19 +15,34 @@ import Component from 'vue-class-component'
 
 import MessageCard from './MessageCard.vue'
 
+import type { Message, Direction } from '@/types'
+
 @Component({
   components: {
     MessageCard
   }
 })
 export default class EncryptDecrypt extends Vue {
-  public messageCnt = 1
+  public messages: Array<Message> = []
 
-  add_message_card (): void {
-    ++this.messageCnt
+  private add_message_card (direction: Direction): void {
+    this.messages.push({
+      plainText: '',
+      cipherText: '',
+      direction
+    })
     window.scrollTo(0, document.body.scrollHeight)
   }
+
+  new_msg_in (): void {
+    this.add_message_card('in')
+  }
+
+  new_msg_out (): void {
+    this.add_message_card('out')
+  }
 }
+
 </script>
 
 <style scoped>

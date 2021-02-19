@@ -1,13 +1,21 @@
 <template lang="pug">
 div
-  textarea sample text
+
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 import Component from 'vue-class-component'
 
-@Component
+import DecryptBox from './DecryptBox.vue'
+import EncryptBox from './EncryptBox.vue'
+
+@Component({
+  components: {
+    DecryptBox,
+    EncryptBox
+  }
+})
 export default class MessageCard extends Vue {
 
 }
