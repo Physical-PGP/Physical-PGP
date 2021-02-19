@@ -2,7 +2,8 @@
 div
   message-card(
     v-for="(message, index) in messages" :key="index"
-    :message="message"
+    :message.sync="message"
+    :id="index"
   )
   button(@click="new_msg_in") New In
   button(@click="new_msg_out") New Out
