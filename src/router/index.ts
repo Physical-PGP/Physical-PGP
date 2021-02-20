@@ -25,6 +25,8 @@ const routes: Array<RouteConfig> = [
       if (to.name !== KeypairConfig.name) {
         if (!storeProxy.setupCompleted) {
           next({ name: KeypairConfig.name })
+        } else {
+          next()
         }
       } else {
         next()
