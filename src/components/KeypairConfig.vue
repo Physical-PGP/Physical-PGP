@@ -30,6 +30,7 @@ export default class KeypairConfig extends Vue {
   store = storeProxy
 
   confirm (): void {
+    storeProxy.calculate_raw_keys()
     this.$router.push({ name: EnD.name })
   }
 

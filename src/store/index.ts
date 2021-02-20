@@ -2,18 +2,9 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import { action, createModule, createProxy, extractVuexModule } from 'vuex-class-component'
 import * as openpgp from 'openpgp'
+import type { KeyConfig } from '@/types'
 
-interface ECCConfig {
-  algorithm: 'ECC'
-  option: 'curve25519' | 'ed25519' | 'p256' | 'p384' | 'p521' | 'secp256k1' | 'brainpoolP256r1' | 'brainpoolP384r1' | 'brainpoolP512r1'
-}
-
-interface RSAConfig {
-  algorithm: 'RSA'
-  option: 2048 | 4096
-}
-
-type KeyConfig = (ECCConfig | RSAConfig) & { passphrase: string }
+type Key = openpgp.key.Key
 
 Vue.use(Vuex)
 
@@ -25,6 +16,10 @@ class Store extends vuexModule {
   public localPubKey = ''
   public localPriKey = ''
   public remotePubKey = ''
+  public rawLocalPubKey!: Array<Key>
+  public rawLocalPriKey!: Array<Key>
+  public rawRemotePubKey!: Array<Key>
+  public rawKeysCalculated = false
   private _keyConfig: KeyConfig = {
     algorithm: 'ECC',
     option: 'ed25519',
@@ -35,7 +30,14 @@ class Store extends vuexModule {
     return !!this.localPubKey && !!this.localPriKey && !!this.remotePubKey
   }
 
-  @action public async gen_keypair () {
+  @action async calculate_raw_keys (): Promise<void> {
+    this.rawLocalPubKey = (await openpgp.key.readArmored(this.localPubKey)).keys
+    this.rawLocalPriKey = (await openpgp.key.readArmored(this.localPriKey)).keys
+    this.rawRemotePubKey = (await openpgp.key.readArmored(this.remotePubKey)).keys
+    this.rawKeysCalculated = true
+  }
+
+  @action public async gen_keypair (): Promise<void> {
     const newKeyPair = await openpgp.generateKey({
       userIds: [{}],
       passphrase: this._keyConfig.passphrase,
@@ -45,6 +47,30 @@ class Store extends vuexModule {
     this.localPubKey = newKeyPair.publicKeyArmored
     this.localPriKey = newKeyPair.privateKeyArmored
   }
+
+  @action async encrypt (msg: string): Promise<string> {
+    if (!this.rawKeysCalculated) {
+      this.calculate_raw_keys()
+    }
+    const options: openpgp.EncryptOptions = {
+      message: openpgp.message.fromText(msg),
+      publicKeys: this.rawRemotePubKey, // remote public key for encryption
+      privateKeys: this.rawLocalPriKey // local private key for signinig
+    }
+    return (await openpgp.encrypt(options)).data
+  }
+
+  @action async decrypt (cihper: string): Promise<string> {
+    if (!this.rawKeysCalculated) {
+      this.calculate_raw_keys()
+    }
+    const options: openpgp.DecryptOptions = {
+      message: await openpgp.message.readArmored(cihper),
+      publicKeys: this.rawRemotePubKey, // remote public key for verification
+      privateKeys: this.rawLocalPriKey // local private key for decryption
+    }
+    return (await openpgp.decrypt(options)).data
+  }
 }
 
 const store = new Vuex.Store({
@@ -53,4 +79,3 @@ const store = new Vuex.Store({
 
 export const storeProxy = createProxy(store, Store)
 export default store
-export type { KeyConfig }
