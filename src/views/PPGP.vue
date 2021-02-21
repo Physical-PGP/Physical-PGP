@@ -5,5 +5,10 @@
 
 <script lang="ts">
 import Vue from 'vue'
-export default class PPGP extends Vue {}
+import Component from 'vue-class-component'
+
+@Component
+export default class PPGP extends Vue {
+  static readonly id = 'PPGP'
+}
 </script>

@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 
-import Home from '../views/Home.vue'
+import Home from '@/views/Home.vue'
 import PPGP from '@/views/PPGP.vue'
 import EncryptDecrypt from '@/components/EncryptDecrypt.vue'
 import KeypairConfig from '@/components/KeypairConfig.vue'
@@ -13,18 +13,18 @@ Vue.use(VueRouter)
 const routes: Array<RouteConfig> = [
   {
     path: '/',
-    name: Home.name,
+    name: Home.id,
     component: Home
   },
   {
     path: '/ppgp',
-    name: PPGP.name,
+    name: PPGP.id,
     component: PPGP,
     beforeEnter: (to, _, next) => {
       // Deny service if keypair missing
-      if (to.name !== KeypairConfig.name) {
+      if (to.name !== KeypairConfig.id) {
         if (!storeProxy.setupCompleted) {
-          next({ name: KeypairConfig.name })
+          next({ name: KeypairConfig.id })
         } else {
           next()
         }
@@ -39,12 +39,12 @@ const routes: Array<RouteConfig> = [
       },
       {
         path: 'keypair',
-        name: KeypairConfig.name,
+        name: KeypairConfig.id,
         component: KeypairConfig
       },
       {
         path: 'E&D',
-        name: EncryptDecrypt.name,
+        name: EncryptDecrypt.id,
         component: EncryptDecrypt
       }
     ]

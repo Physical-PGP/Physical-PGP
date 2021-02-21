@@ -9,6 +9,7 @@ type Key = openpgp.key.Key
 Vue.use(Vuex)
 
 const vuexModule = createModule({
+  namespaced: 'store',
   strict: false
 })
 
@@ -74,7 +75,9 @@ class Store extends vuexModule {
 }
 
 const store = new Vuex.Store({
-  ...extractVuexModule(Store).store
+  modules: {
+    ...extractVuexModule(Store)
+  }
 })
 
 export const storeProxy = createProxy(store, Store)

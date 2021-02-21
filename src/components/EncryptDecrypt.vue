@@ -24,6 +24,7 @@ import type { Message, Direction } from '@/types'
   }
 })
 export default class EncryptDecrypt extends Vue {
+  static readonly id = 'EncryptDecrypt'
   public messages: Array<Message> = []
 
   private add_message_card (direction: Direction): void {

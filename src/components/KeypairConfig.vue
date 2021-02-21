@@ -27,11 +27,12 @@ import EnD from './EncryptDecrypt.vue'
 
 @Component
 export default class KeypairConfig extends Vue {
+  static readonly id = 'KeypairConfig'
   store = storeProxy
 
   confirm (): void {
     storeProxy.calculate_raw_keys()
-    this.$router.push({ name: EnD.name })
+    this.$router.push({ name: EnD.id })
   }
 
   // private import_keypair (): void {

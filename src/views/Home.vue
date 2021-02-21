@@ -3,7 +3,7 @@
     p
       router-link(:to="{name: ppgpPageName}") Start!
     p
-      router-link(:to="{name: docPageName}")
+      router-link(:to="{name: docPageName}") Documentation (not finished)
 </template>
 
 <script lang="ts">
@@ -14,6 +14,7 @@ import PPGP from '@/views/PPGP.vue'
 
 @Component
 export default class Home extends Vue {
-  private ppgpPageName = PPGP.name
+  static readonly id = 'Home'
+  private ppgpPageName = PPGP.id
 }
 </script>
