@@ -5,8 +5,8 @@ div
     :message.sync="message"
     :id="index"
   )
-  button(@click="new_msg_in") New In
-  button(@click="new_msg_out") New Out
+  v-btn.ma-2(@click="new_msg_in") New In
+  v-btn.ma-2(@click="new_msg_out") New Out
   div#bottom
 </template>
 

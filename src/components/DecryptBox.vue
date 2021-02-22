@@ -1,8 +1,17 @@
 <template lang="pug">
-div
-  textarea(v-model="cipher")
-  textarea(v-model="plain")
-  span Decrypt
+v-row
+  v-col
+    v-textarea(
+      solo
+      v-model="cipher"
+    )
+  v-col
+    v-textarea(
+      solo
+      v-model="plain"
+    )
+  v-col
+    span Decrypt
 </template>
 
 <script lang="ts">

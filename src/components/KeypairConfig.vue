@@ -1,20 +1,43 @@
 <template lang="pug">
 div
   p Generate new keypair or import from local.
-  p
-    button(@click="store.gen_keypair") New
-    //- button(@click="import_keypair" disabled) Import
-  p
-    | Public Key
-    textarea(v-model="store.localPubKey" disabled)
-  p
-    | Private Key
-    textarea(v-model="store.localPriKey" disabled)
+  div.mb-2
+    v-btn.mx-2(@click="store.gen_keypair") New
+  div.mb-5
+    v-btn.mx-2(disabled) Import
+  div
+    v-row
+      v-col
+      v-col.col-4
+        v-textarea.text-body-2(
+          outlined
+          label="Local Public Key"
+          v-model="store.localPubKey"
+          rows="6"
+          no-resize
+        )
+      v-col.col-4
+        v-textarea.text-body-2(
+          outlined
+          label="Local Private Key"
+          v-model="store.localPriKey"
+          rows="6"
+          no-resize
+        )
+      v-col
   p Input remote public key bellow
+  div
+    v-row
+      v-col
+      v-col
+        v-textarea.text-body-2(
+          outlined
+          label="Remote Public Key"
+          v-model="store.remotePubKey"
+        )
+      v-col
   p
-    textarea(v-model="store.remotePubKey")
-  p
-    button(
+    v-btn.primary(
       :disabled="!store.setupCompleted"
       @click="confirm"
     ) Confirm
@@ -40,3 +63,6 @@ export default class KeypairConfig extends Vue {
   // }
 }
 </script>
+
+<style scoped>
+</style>
