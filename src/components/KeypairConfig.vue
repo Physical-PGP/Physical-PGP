@@ -12,7 +12,7 @@ div
         v-textarea.text-body-2(
           outlined
           label="Local Public Key"
-          v-model="store.localPubKey"
+          v-model="store.localPubKeyBase64"
           rows="6"
           no-resize
         )
@@ -20,7 +20,7 @@ div
         v-textarea.text-body-2(
           outlined
           label="Local Private Key"
-          v-model="store.localPriKey"
+          v-model="store.localPriKeyBase64"
           rows="6"
           no-resize
         )
@@ -33,7 +33,7 @@ div
         v-textarea.text-body-2(
           outlined
           label="Remote Public Key"
-          v-model="store.remotePubKey"
+          v-model="store.remotePubKeyBase64"
         )
       v-col
   p

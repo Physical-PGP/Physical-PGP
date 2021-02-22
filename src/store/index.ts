@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import { action, createModule, createProxy, extractVuexModule } from 'vuex-class-component'
 import * as openpgp from 'openpgp'
 import type { KeyConfig } from '@/types'
+import { base64_encode, base64_decode } from '@/tools'
 
 type Key = openpgp.key.Key
 
@@ -29,6 +30,30 @@ class Store extends vuexModule {
 
   get setupCompleted (): boolean {
     return !!this.localPubKey && !!this.localPriKey && !!this.remotePubKey
+  }
+
+  get localPubKeyBase64 (): string {
+    return base64_encode(this.localPubKey)
+  }
+
+  set localPubKeyBase64 (localPubKeyBase64: string) {
+    this.localPubKey = base64_decode(localPubKeyBase64)
+  }
+
+  get localPriKeyBase64 (): string {
+    return base64_encode(this.localPriKey)
+  }
+
+  set localPriKeyBase64 (localPriKeyBase64: string) {
+    this.localPriKey = base64_decode(localPriKeyBase64)
+  }
+
+  get remotePubKeyBase64 (): string {
+    return base64_encode(this.remotePubKey)
+  }
+
+  set remotePubKeyBase64 (remotePubKeyBase64: string) {
+    this.remotePubKey = base64_decode(remotePubKeyBase64)
   }
 
   @action async calculate_raw_keys (): Promise<void> {
@@ -58,15 +83,18 @@ class Store extends vuexModule {
       publicKeys: this.rawRemotePubKey, // remote public key for encryption
       privateKeys: this.rawLocalPriKey // local private key for signinig
     }
-    return (await openpgp.encrypt(options)).data
+    const cipherArmored = (await openpgp.encrypt(options)).data
+    return base64_encode(cipherArmored)
   }
 
-  @action async decrypt (cihper: string): Promise<string> {
+  @action async decrypt (cipherBase64: string): Promise<string> {
     if (!this.rawKeysCalculated) {
       this.calculate_raw_keys()
     }
+
+    const cipher = base64_decode(cipherBase64)
     const options: openpgp.DecryptOptions = {
-      message: await openpgp.message.readArmored(cihper),
+      message: await openpgp.message.readArmored(cipher),
       publicKeys: this.rawRemotePubKey, // remote public key for verification
       privateKeys: this.rawLocalPriKey // local private key for decryption
     }

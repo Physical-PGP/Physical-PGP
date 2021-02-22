@@ -3,14 +3,15 @@ v-row
   v-col
     span Encrypt
   v-col
-    v-textarea(
+    v-textarea.text-body-1(
       solo
       v-model="plain"
     )
   v-col
-    v-textarea(
+    v-textarea.text-body-2(
       solo
       v-model="cipher"
+      no-resize
     )
 </template>
 
