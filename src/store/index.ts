@@ -3,7 +3,7 @@ import Vuex from 'vuex'
 import { action, createModule, createProxy, extractVuexModule } from 'vuex-class-component'
 import * as openpgp from 'openpgp'
 import type { KeyConfig } from '@/types'
-import { base64_encode, base64_decode } from '@/tools'
+import { break_armor, forge_armor, change_key_armor } from '@/tools'
 
 type Key = openpgp.key.Key
 
@@ -32,30 +32,6 @@ class Store extends vuexModule {
     return !!this.localPubKey && !!this.localPriKey && !!this.remotePubKey
   }
 
-  get localPubKeyBase64 (): string {
-    return base64_encode(this.localPubKey)
-  }
-
-  set localPubKeyBase64 (localPubKeyBase64: string) {
-    this.localPubKey = base64_decode(localPubKeyBase64)
-  }
-
-  get localPriKeyBase64 (): string {
-    return base64_encode(this.localPriKey)
-  }
-
-  set localPriKeyBase64 (localPriKeyBase64: string) {
-    this.localPriKey = base64_decode(localPriKeyBase64)
-  }
-
-  get remotePubKeyBase64 (): string {
-    return base64_encode(this.remotePubKey)
-  }
-
-  set remotePubKeyBase64 (remotePubKeyBase64: string) {
-    this.remotePubKey = base64_decode(remotePubKeyBase64)
-  }
-
   @action async calculate_raw_keys (): Promise<void> {
     this.rawLocalPubKey = (await openpgp.key.readArmored(this.localPubKey)).keys
     this.rawLocalPriKey = (await openpgp.key.readArmored(this.localPriKey)).keys
@@ -70,7 +46,7 @@ class Store extends vuexModule {
       curve: this._keyConfig.algorithm === 'ECC' ? this._keyConfig.option : undefined,
       numBits: this._keyConfig.algorithm === 'RSA' ? this._keyConfig.option : undefined
     })
-    this.localPubKey = newKeyPair.publicKeyArmored
+    this.localPubKey = change_key_armor(newKeyPair.publicKeyArmored)
     this.localPriKey = newKeyPair.privateKeyArmored
   }
 
@@ -84,17 +60,19 @@ class Store extends vuexModule {
       privateKeys: this.rawLocalPriKey // local private key for signinig
     }
     const cipherArmored = (await openpgp.encrypt(options)).data
-    return base64_encode(cipherArmored)
+    const cipherNaked = break_armor(cipherArmored)
+    console.log(cipherNaked)
+    return cipherNaked
   }
 
-  @action async decrypt (cipherBase64: string): Promise<string> {
+  @action async decrypt (cipherNaked: string): Promise<string> {
     if (!this.rawKeysCalculated) {
       this.calculate_raw_keys()
     }
 
-    const cipher = base64_decode(cipherBase64)
+    const cipherArmored = forge_armor(cipherNaked, 'message')
     const options: openpgp.DecryptOptions = {
-      message: await openpgp.message.readArmored(cipher),
+      message: await openpgp.message.readArmored(cipherArmored),
       publicKeys: this.rawRemotePubKey, // remote public key for verification
       privateKeys: this.rawLocalPriKey // local private key for decryption
     }
